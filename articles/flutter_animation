@@ -1,0 +1,42 @@
+# Tutorial: Animations in Flitter
+
+将要学到：
+* 如何在组件中使用 animation library 的基础类
+* 如何链化 Tween Animation
+* 何时使用 animatedWidget 和 animatedBuilder
+
+## 必要的概念和类
+
+* Animation 类，动画的核心类，‘插值来引导动画’
+* animation 对象只关心当前动画**状态**，不关心屏幕上有什么
+* AnimationController 管理动画
+* CurvedAnimation 定义一个非线性动画
+* Tween 在一个给定的范围内插值，比如定义颜色从红色到蓝色
+* Listener、StatusListener 用来监控动画状态改变
+
+#### Animation<double>
+> Animation 类是一个抽象类，它有当前动画的值和状态。最常用的是 Animation<double>，
+它通常在一个确定的范围生成插值数。Animation 的输出可以是一个线性的、非线性的、分步的、函数。
+
+#### CurvedAnimation 
+```dart
+final CurvedAnimation curve =
+  new CurvedAnimation(parent: controller, curve: Curves.easeIn);
+// Curves 对象包含了一些常用的曲线
+```
+
+#### AnimationController
+> AnimationController 也是一个特殊的 animation 对象。它默认生成 0.0 ~ 1.0 之间的线性的数值
+```dart
+final AnimationController controller = new AnimationController(
+    duration: const Duration(milliseconds: 2000), vsync: this);
+```
+> AnimationController 在Animation<double> 基础上添加了控制动画的函数。
+你可以使用 `forward()` 开始动画，生成的数值会绑定到屏幕上刷新。
+
+> 在创建 AnimationController 时传入了一个 `vsync`， 它的存在阻止了不在屏幕显示区上的动画浪费不必要的资源
+
+
+#### Tween
+
+
