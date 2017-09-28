@@ -1,6 +1,6 @@
 # Tutorial: Animations in Flitter
 
-将要学到：
+将要了解：
 * 如何在组件中使用 animation library 的基础类
 * 如何链化 Tween Animation
 * 何时使用 animatedWidget 和 animatedBuilder
@@ -38,5 +38,77 @@ final AnimationController controller = new AnimationController(
 
 
 #### Tween
+> AnimationController 生成 0.0 ~ 1.0 范围的数，Tween 可以生产任意范围的数。
+```dart
+final Tween doubleTween = new Tween<double>(begin: -200.0, end: 0.0);
+```
+tween 唯一的作用是生产包含一个范围内的数的 `map`。它不保存任何状态，`provide()`提供值， `value`是当前值。
+
+###### Tween.animate()
+> tween.animate() 返回一个 `Animation`
+```dart
+final AnimationController controller = new AnimationController(
+    duration: const Duration(milliseconds: 500), vsync: this);
+Animation<int> alpha = new IntTween(begin: 0, end: 255).animate(controller);
+```
+```dart
+final AnimationController controller = new AnimationController(
+    duration: const Duration(milliseconds: 500), vsync: this);
+final Animation curve =
+    new CurvedAnimation(parent: animation, curve: Curves.easeOut);
+Animation<int> alpha = new IntTween(begin: 0, end: 255).animate(curve);
+```
+
+#### Animation notifications
+> 一个 Animation 对象可以有 Listeners 和 StatusListeners，
+用于监听动画状态
 
 
+## Animation examples
+
+```dart
+import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart';
+
+class LogoApp extends StatefulWidget {
+  _LogoAppState createState() => new _LogoAppState();
+}
+
+class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
+  Animation<double> animation;
+  AnimationController controller;
+
+  initState() {
+    super.initState();
+    controller = new AnimationController(
+        duration: const Duration(milliseconds: 2000), vsync: this);
+    animation = new Tween(begin: 0.0, end: 300.0).animate(controller)
+      ..addListener(() {
+        setState(() {
+          // the state that has changed here is the animation object’s value
+        });
+      });
+    controller.forward();
+  }
+
+  Widget build(BuildContext context) {
+    return new Center(
+      child: new Container(
+        margin: new EdgeInsets.symmetric(vertical: 10.0),
+        height: animation.value,
+        width: animation.value,
+        child: new FlutterLogo(),
+      ),
+    );
+  }
+
+  dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+}
+
+void main() {
+  runApp(new LogoApp());
+}
+```
