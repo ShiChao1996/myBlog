@@ -59,7 +59,6 @@ function testAction(key1, key2, ...keyN) {
 
 ***另外，reducer 每次返回的必须是一个全新的状态***
 ```js
-
 const initialState = {
   article: {}
 };
@@ -117,4 +116,125 @@ ReactDOM.render(router, document.getElementById('root'));
 一个顶级的管理所有状态的储存器，统一管理状态。然后将生成的 store 通过 `Provider` 组件注入，
 这样为 `Provider` 的子组件提供了状态的获取途径。
 
-###### 
+###### reducers
+index文件:
+```js
+import {combineReducers} from "redux";
+import { admin } from './admin';  //我自己的 reduce 文件
+import { article } from "./article";  //同上
+
+module.exports = combineReducers( {
+  admin: admin,
+  article: article
+});
+```
+
+reduce 文件(示例):
+```js
+import Actions from "../actions/config";
+
+const initialState = {
+  logged: false,
+  token: ''
+};
+
+export function admin(state = initialState, action) {
+  switch (action.type) {
+    case Actions.USER_LOGIN: {
+      let token = action.token;
+      return { ...state, logged: true, token: token };
+    }
+
+    case Actions.USER_LOGOUT: {
+      return { ...state, logged: false };
+    }
+  }
+
+  return state;
+}
+
+```
+
+###### actions
+index: 
+```js
+import { admin } from "./admin";
+import { article } from "./article";
+
+module.exports = {
+  ...admin,
+  ...article
+};
+```
+
+admin action: 
+```js
+import Actions from "./config";   //储存常量字符串
+
+function login(token) {
+  return {
+    type: Actions.USER_LOGIN,
+    token: token
+  };
+}
+
+function logOut() {
+  return {
+    type: Actions.USER_LOGOUT,
+  };
+}
+
+export const admin = {
+  login,
+  logOut,
+};
+```
+
+config：
+```js
+module.exports = {
+  //user
+  USER_LOGIN: "USER_LOGIN",
+  USER_LOGOUT:"USER_LOGOUT",
+
+
+  //article
+  ADD_ARTICLE_TAG: "ADD_ARTICLE_TAG",
+  REMOVE_ARTICLE_TAG: "REMOVE_ARTICLE_TAG",
+  SAVE_CONTENT: "SAVE_CONTENT",
+  EDIT_ARTICLE: "EDIT_ARTICLE",
+  CLEAR: "CLEAR",
+
+  //http
+  GET_PERSONAL_PAGE_INFO: "GET_PERSONAL_PAGE_INFO",
+  GET_USER_INFO: "GET_USER_INFO"
+};
+
+```
+
+##### 使用redux
+>以上步骤已经配置好了。接下来在组件中使用redux
+
+>首先要用到的是高阶函数 `connect`
+
+引入 `connect`：
+```js
+import {connect} from "react-redux";
+```
+连接：
+```js
+function select(store) {
+  return {
+    logged: store.admin.logged,  // 这里写你当前组件要用到的redux里的状态
+    token: store.admin.token
+  }
+}
+
+export default connect(select)(componentName);  //componentName 是你的组件名称
+//如果不需要redux的数据，可以这样写：
+//export default connect()(componentName); 
+```
+
+这一步把当前组件和 redux 连在一起，把 `logged`、`token`传到当前组件的 props 里。
+需要注意的是：还会隐藏的将 `dispatch` 方法一起注入到 props 
+
