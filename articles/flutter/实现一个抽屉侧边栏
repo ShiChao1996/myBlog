@@ -1,0 +1,20 @@
+### 必要的类
+##### Scaffold
+>默认的 Scaffold 组件会有自动控制抽屉侧边栏的行为。
+```dart
+@override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: new Text('this is title'),
+          actions: null,
+        ),
+        drawer: new Drawer(),
+      ),
+    );
+  }
+```
+
+如果按照上面这样写，顶部 AppBar 会默认有一个打开侧边栏的按钮
+![](../../imgs/appbar.png)
