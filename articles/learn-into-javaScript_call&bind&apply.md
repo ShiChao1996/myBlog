@@ -137,3 +137,61 @@ Function.prototype.call1 = function(context) {
 ```
 
 大功告成！ｂ（￣▽￣）ｄ
+
+## apply
+> 和 call 一样，只是参数是以数组的形式给出
+##### 模拟实现
+```js
+Function.prototype.apply = function (context, arr) {
+    var context = Object(context) || window;
+    context.fn = this;
+
+    var result;
+    if (!arr) {
+        result = context.fn();
+    }
+    else {
+        var args = [];
+        for (var i = 0, len = arr.length; i < len; i++) {
+            args.push('arr[' + i + ']');
+        }
+        result = eval('context.fn(' + args + ')')
+    }
+
+    delete context.fn
+    return result;
+}
+```
+
+## bind
+> MDN 的解释：bind() 函数会创建一个新函数（称为绑定函数），新函数与被调函数（绑定函数的目标函数）具有相同的函数体（在 ECMAScript 5 规范中内置的call属性）。当新函数被调用时 this 值绑定到 bind() 的第一个参数，该参数不能被重写。
+```js
+Function.prototype.bind = function (oThis) {
+ if (typeof this !== "function") {
+   // closest thing possible to the ECMAScript 5 internal IsCallable function
+   throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+ }
+
+ var aArgs = Array.prototype.slice.call(arguments, 1), 
+     fToBind = this, 
+     fNOP = function () {},
+     fBound = function () {
+       return fToBind.apply(this instanceof fNOP && oThis
+                              ? this
+                              : oThis || window,
+                            aArgs.concat(Array.prototype.slice.call(arguments)));
+     };
+
+ fNOP.prototype = this.prototype;
+ fBound.prototype = new fNOP();
+
+ return fBound;
+};
+```
+## call apply bind 区别
+call和apply，bind都是用来改变函数中this的指向
+不同的是call和apply不仅改变了函数中this的指向并且立即调用了函数而bind仅仅是替换了this没有调用
+
+apply和call的区别在于当Parent有参数的时候call只能一个一个的赋值 apply可以以数组的方式传递
+bind体验了js的预处理，预先处理数据 稍后之行
+
